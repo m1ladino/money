@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c7a44">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="ikona-apple.png">
+<link rel="icon" type="image/png" sizes="192x192" href="ikona-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zarada">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Jednostavna aplikacija za praćenje prodaje, troškova nabavke i zarade u dinarima.">
+<title>Moja zarada — praćenje prodaje u dinarima</title>
+<style>
+:root{
+  --bg:#f4f6f8;
+  --povrsina:#ffffff;
+  --tekst:#14181f;
+  --tekst-blago:#5c6470;
+  --ivica:#e2e6ec;
+  --akcenat:#0c7a44;
+  --akcenat-tamniji:#095c33;
+  --akcenat-tekst:#ffffff;
+  --minus:#c62828;
+  --font:-apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --razmak-1:.5rem;
+  --razmak-2:1rem;
+  --razmak-3:1.5rem;
+  --razmak-4:2.5rem;
+  --razmak-5:4rem;
+  --radijus:18px;
+  --radijus-mali:12px;
+  --senka:0 1px 2px rgba(16,18,29,.05), 0 10px 30px rgba(16,18,29,.06);
+  --sirina:1000px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e1014;
+    --povrsina:#171a21;
+    --tekst:#eceef2;
+    --tekst-blago:#a8afbb;
+    --ivica:#272c35;
+    --akcenat:#2fbd76;
+    --akcenat-tamniji:#4fd193;
+    --akcenat-tekst:#08130c;
+    --minus:#ff7b72;
+    --senka:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--tekst);font-family:var(--font);
+  font-size:1.0625rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.omot{width:100%;max-width:var(--sirina);margin-inline:auto;padding-inline:var(--razmak-2)}
+h1{font-size:1.5rem;line-height:1.2;letter-spacing:-.02em;margin:0}
+h2{font-size:1.25rem;line-height:1.3;letter-spacing:-.01em;margin:0 0 var(--razmak-2)}
+h3{font-size:1rem;margin:0 0 var(--razmak-1)}
+small{font-size:.875rem}
+
+header.vrh{
+  position:sticky;top:0;z-index:20;background:var(--povrsina);
+  border-bottom:1px solid var(--ivica);
+  padding:calc(var(--razmak-2) + env(safe-area-inset-top, 0px)) 0 var(--razmak-2);
+}
+.omot{padding-left:calc(var(--razmak-2) + env(safe-area-inset-left, 0px));
+      padding-right:calc(var(--razmak-2) + env(safe-area-inset-right, 0px))}
+footer{padding-bottom:calc(var(--razmak-3) + env(safe-area-inset-bottom, 0px))}
+.vrh-red{display:flex;align-items:center;justify-content:space-between;gap:var(--razmak-2)}
+.logo{display:flex;align-items:center;gap:.6rem}
+.logo-znak{
+  width:42px;height:42px;flex:none;border-radius:12px;
+  background:var(--akcenat);color:var(--akcenat-tekst);
+  display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+}
+.datum-danas{color:var(--tekst-blago);font-size:.85rem;margin:.1rem 0 0}
+
+main{padding-block:var(--razmak-3) var(--razmak-5)}
+section{margin-bottom:var(--razmak-4)}
+
+.mreza{display:grid;gap:var(--razmak-2);grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kartica{
+  background:var(--povrsina);border:1px solid var(--ivica);
+  border-radius:var(--radijus);padding:var(--razmak-2);box-shadow:var(--senka);
+}
+.kartica--glavna{padding:var(--razmak-3)}
+.stat-oznaka{display:flex;align-items:center;gap:.4rem;color:var(--tekst-blago);font-size:.85rem;margin:0}
+.stat-broj{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:.35rem 0 0;line-height:1.15}
+.stat-broj.veliki{font-size:2rem}
+.stat-dodatak{color:var(--tekst-blago);font-size:.8rem;margin:.2rem 0 0}
+.minus{color:var(--minus)}
+.plus{color:var(--akcenat)}
+
+.traka-meseca{display:flex;align-items:center;justify-content:space-between;gap:var(--razmak-1);margin-bottom:var(--razmak-2)}
+.mesec-ime{font-weight:700;font-size:1.05rem;text-align:center;flex:1}
+.strelica{
+  width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--ivica);
+  background:var(--povrsina);color:var(--tekst);font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background .15s ease;
+}
+.strelica:hover{background:var(--bg)}
+.strelica:active{transform:translateY(1px)}
+.strelica:focus-visible{outline:2px solid var(--akcenat);outline-offset:2px}
+
+form .polja{display:grid;gap:var(--razmak-2);grid-template-columns:1fr}
+@media (min-width:600px){
+  form .polja{grid-template-columns:1fr 1fr}
+  .polje--siroko{grid-column:1 / -1}
+}
+label{display:block;font-size:.9rem;font-weight:600;margin-bottom:.35rem}
+input, select{
+  width:100%;padding:.85rem .9rem;font:inherit;
+  border:1px solid var(--ivica);border-radius:var(--radijus-mali);
+  background:var(--bg);color:var(--tekst);
+}
+input:focus-visible, select:focus-visible{outline:2px solid var(--akcenat);outline-offset:1px;border-color:var(--akcenat)}
+.dugme{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  min-height:48px;padding:.8rem 1.3rem;font:inherit;font-weight:700;cursor:pointer;
+  border:1px solid transparent;border-radius:var(--radijus-mali);
+  background:var(--akcenat);color:var(--akcenat-tekst);
+  transition:background .15s ease, transform .15s ease;
+}
+.dugme:hover{background:var(--akcenat-tamniji)}
+.dugme:active{transform:translateY(1px)}
+.dugme:focus-visible{outline:2px solid var(--akcenat);outline-offset:2px}
+.dugme--sporedno{background:transparent;color:var(--tekst);border-color:var(--ivica);font-weight:600}
+.dugme--sporedno:hover{background:var(--bg)}
+.dugme--puno{width:100%}
+
+.pregled-zarade{
+  margin-top:var(--razmak-2);padding:var(--razmak-2);border-radius:var(--radijus-mali);
+  background:var(--bg);border:1px dashed var(--ivica);font-weight:600;
+}
+.poruka{margin-top:var(--razmak-2);font-weight:600;color:var(--akcenat)}
+.poruka.greska{color:var(--minus)}
+
+.grafikon{display:flex;align-items:flex-end;gap:2px;height:150px;margin-top:var(--razmak-1)}
+.stub-omot{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+.stub{background:var(--akcenat);border-radius:4px 4px 0 0;min-height:2px;transition:height .2s ease}
+.stub.stub--minus{background:var(--minus);border-radius:0 0 4px 4px}
+.stub-omot--minus{justify-content:flex-start}
+.osa{display:flex;gap:2px;margin-top:.4rem;color:var(--tekst-blago);font-size:.7rem}
+.osa span{flex:1;text-align:center;min-width:0}
+.nula-linija{height:1px;background:var(--ivica);margin:0}
+
+.tabela-omot{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.95rem;min-width:460px}
+th, td{text-align:right;padding:.7rem .5rem;border-bottom:1px solid var(--ivica);white-space:nowrap}
+th:first-child, td:first-child{text-align:left;white-space:normal}
+th{font-size:.8rem;color:var(--tekst-blago);font-weight:600}
+tfoot td{font-weight:700;border-bottom:none}
+
+.lista{list-style:none;margin:0;padding:0}
+.lista li{
+  display:flex;align-items:center;gap:var(--razmak-2);
+  padding:.75rem 0;border-bottom:1px solid var(--ivica);
+}
+.lista li:last-child{border-bottom:none}
+.stavka-glavno{flex:1;min-width:0}
+.stavka-naziv{font-weight:600;margin:0;overflow-wrap:anywhere}
+.stavka-detalj{color:var(--tekst-blago);font-size:.82rem;margin:.1rem 0 0}
+.stavka-iznos{font-weight:700;text-align:right;white-space:nowrap}
+.brisi{
+  width:40px;height:40px;flex:none;border-radius:10px;border:1px solid var(--ivica);
+  background:transparent;cursor:pointer;font-size:1rem;color:var(--tekst);
+}
+.brisi:hover{background:var(--bg)}
+.brisi:focus-visible{outline:2px solid var(--akcenat);outline-offset:2px}
+
+.prazno{color:var(--tekst-blago);text-align:center;padding:var(--razmak-3) var(--razmak-1);margin:0}
+.alatke{display:flex;flex-wrap:wrap;gap:var(--razmak-1)}
+footer{border-top:1px solid var(--ivica);padding:var(--razmak-3) 0;color:var(--tekst-blago);font-size:.85rem}
+footer p{margin:.3rem 0;max-width:70ch}
+.sakrij{display:none !important}
+
+/* ---- nalog i sinhronizacija ---- */
+.traka-status{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--razmak-1);
+  background:var(--povrsina);border:1px solid var(--ivica);border-radius:var(--radijus-mali);
+  padding:.6rem .8rem;margin-bottom:var(--razmak-3);font-size:.9rem;
+}
+.traka-status .stanje{display:flex;align-items:center;gap:.45rem;min-width:0}
+.traka-status .stanje span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.veza-dugme{
+  background:none;border:none;padding:.4rem;font:inherit;font-weight:600;
+  color:var(--akcenat);cursor:pointer;text-decoration:underline;white-space:nowrap;
+}
+.veza-dugme:focus-visible{outline:2px solid var(--akcenat);outline-offset:2px}
+.koraci{margin:0 0 var(--razmak-2);padding-left:1.2rem}
+.koraci li{margin-bottom:.6rem;max-width:70ch}
+.sql-kutija{
+  background:var(--bg);border:1px solid var(--ivica);border-radius:var(--radijus-mali);
+  padding:.7rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.72rem;line-height:1.45;white-space:pre;overflow-x:auto;margin:.5rem 0;
+}
+details{border:1px solid var(--ivica);border-radius:var(--radijus-mali);padding:.7rem .9rem;margin-bottom:var(--razmak-2)}
+summary{cursor:pointer;font-weight:600}
+summary:focus-visible{outline:2px solid var(--akcenat);outline-offset:2px}
+
+/* ---- mesečni izvod (PDF) ---- */
+#izvod{display:none}
+@media print{
+  @page{size:A4;margin:14mm}
+  html,body{background:#fff !important;color:#000 !important}
+  header.vrh, main, footer{display:none !important}
+  #izvod{
+    display:block !important;font-size:11pt;line-height:1.45;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+}
+#izvod .izvod-vrh{border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:16px}
+#izvod h2{font-size:19pt;margin:0 0 2px}
+#izvod h3{font-size:12pt;margin:18px 0 6px;border-bottom:1px solid #999;padding-bottom:3px}
+#izvod .izvod-podnaslov{margin:0;font-size:10pt;color:#444}
+#izvod .izvod-mreza{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+#izvod .izvod-kutija{border:1px solid #bbb;border-radius:6px;padding:8px 10px}
+#izvod .izvod-kutija p{margin:0}
+#izvod .izvod-oznaka{font-size:8.5pt;color:#444;text-transform:uppercase;letter-spacing:.03em}
+#izvod .izvod-broj{font-size:14pt;font-weight:700}
+#izvod ul{margin:0;padding-left:18px}
+#izvod li{margin-bottom:5px;font-size:10.5pt}
+#izvod table{width:100%;border-collapse:collapse;font-size:10pt;min-width:0}
+#izvod th,#izvod td{border-bottom:1px solid #ccc;padding:5px 4px;text-align:right;white-space:nowrap;color:#000}
+#izvod th:first-child,#izvod td:first-child{text-align:left;white-space:normal}
+#izvod thead th{border-bottom:1.5px solid #000;font-size:9pt;color:#000}
+#izvod tfoot td{font-weight:700;border-top:1.5px solid #000;border-bottom:none}
+#izvod .izvod-grafikon{display:flex;align-items:flex-end;gap:1.5px;height:70px;border-bottom:1px solid #000;margin-top:8px}
+#izvod .izvod-stub{flex:1;background:#0c7a44;border:.5px solid #0c7a44;min-height:1px}
+#izvod .izvod-osa{display:flex;gap:1.5px;font-size:7.5pt;color:#444;margin-top:2px}
+#izvod .izvod-osa span{flex:1;text-align:center}
+#izvod .izvod-potpis{margin-top:20px;border-top:1px solid #999;padding-top:8px;font-size:9pt;color:#444}
+#izvod .lom{page-break-before:always}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<header class="vrh">
+  <div class="omot vrh-red">
+    <div class="logo">
+      <div class="logo-znak" aria-hidden="true">📈</div>
+      <div>
+        <h1>Moja zarada</h1>
+        <p class="datum-danas" id="danasnjiDatum">Danas</p>
+      </div>
+    </div>
+    <button type="button" class="dugme dugme--sporedno" id="dugmeDodaj">➕ Prodaja</button>
+  </div>
+</header>
+
+<main class="omot">
+
+  <div class="traka-status">
+    <span class="stanje"><span id="ikonaStatusa" aria-hidden="true">📱</span><span id="tekstStatusa">Podaci se čuvaju na ovom uređaju</span></span>
+    <button type="button" class="veza-dugme" id="dugmeNalog">Podesi nalog</button>
+  </div>
+
+  <section aria-labelledby="naslovDanas">
+    <h2 id="naslovDanas">💰 Danas</h2>
+    <div class="mreza">
+      <div class="kartica kartica--glavna">
+        <p class="stat-oznaka">🤑 Zarada danas</p>
+        <p class="stat-broj veliki" id="zaradaDanas">0 RSD</p>
+        <p class="stat-dodatak" id="detaljDanas">Nema unetih prodaja</p>
+      </div>
+      <div class="kartica kartica--glavna">
+        <p class="stat-oznaka">🧾 Promet danas</p>
+        <p class="stat-broj veliki" id="prometDanas">0 RSD</p>
+        <p class="stat-dodatak" id="detaljPromet">Ukupno naplaćeno danas</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="naslovMesec">
+    <h2 id="naslovMesec">📊 Mesečni pregled</h2>
+    <div class="traka-meseca">
+      <button type="button" class="strelica" id="mesecNazad" aria-label="Prethodni mesec">◀</button>
+      <span class="mesec-ime" id="imeMeseca">Mesec</span>
+      <button type="button" class="strelica" id="mesecNapred" aria-label="Sledeći mesec">▶</button>
+    </div>
+    <div class="mreza">
+      <div class="kartica">
+        <p class="stat-oznaka">💵 Zarada</p>
+        <p class="stat-broj" id="zaradaMeseca">0 RSD</p>
+      </div>
+      <div class="kartica">
+        <p class="stat-oznaka">🧾 Promet</p>
+        <p class="stat-broj" id="prometMeseca">0 RSD</p>
+      </div>
+      <div class="kartica">
+        <p class="stat-oznaka">📦 Uloženo u robu</p>
+        <p class="stat-broj" id="troskoviMeseca">0 RSD</p>
+      </div>
+      <div class="kartica">
+        <p class="stat-oznaka">📐 Marža</p>
+        <p class="stat-broj" id="marzaMeseca">—</p>
+      </div>
+    </div>
+
+    <div class="kartica" style="margin-top:var(--razmak-2)">
+      <h3>📈 Zarada po danima</h3>
+      <div class="grafikon" id="grafikonPlus" role="img" aria-label="Grafikon zarade po danima u mesecu"></div>
+      <div class="nula-linija" id="nulaLinija"></div>
+      <div class="grafikon sakrij" id="grafikonMinus" style="height:45px;align-items:flex-start" aria-hidden="true"></div>
+      <div class="osa" id="osaDana"></div>
+      <p class="stat-dodatak" id="najboljiDan">Dodaj prvu prodaju da se pojavi grafikon.</p>
+      <button type="button" class="dugme dugme--puno" id="dugmeIzvod" style="margin-top:var(--razmak-2)">🧾 Napravi PDF izvod za ovaj mesec</button>
+      <p class="stat-dodatak" style="margin-top:.6rem">Otvoriće se prozor za štampu — izaberi „Sačuvaj kao PDF".</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="naslovProizvodi">
+    <h2 id="naslovProizvodi">🏆 Zarada po proizvodu</h2>
+    <div class="kartica">
+      <p class="stat-oznaka">📦 Najviše para uloženo u nabavku</p>
+      <p class="stat-broj" id="najvegiTrosak">—</p>
+      <p class="stat-dodatak" id="najvegiTrosakIznos">Za izabrani mesec</p>
+    </div>
+    <div class="kartica tabela-omot" style="margin-top:var(--razmak-2)">
+      <table>
+        <caption class="sakrij">Pregled zarade po proizvodu za izabrani mesec</caption>
+        <thead>
+          <tr>
+            <th scope="col">Proizvod</th>
+            <th scope="col">Kom.</th>
+            <th scope="col">Promet</th>
+            <th scope="col">Zarada</th>
+            <th scope="col">Marža</th>
+          </tr>
+        </thead>
+        <tbody id="telotabele"></tbody>
+        <tfoot id="podnozjeTabele"></tfoot>
+      </table>
+      <p class="prazno" id="prazniProizvodi">Još nema prodaja u ovom mesecu.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="naslovUnos">
+    <h2 id="naslovUnos">➕ Dodaj prodaju</h2>
+    <div class="kartica">
+      <form id="formaProdaje" novalidate>
+        <div class="polja">
+          <div class="polje--siroko">
+            <label for="poljeProizvod">Šta si prodao</label>
+            <input type="text" id="poljeProizvod" name="proizvod" list="spisakProizvoda" placeholder="npr. Majica kratkih rukava" autocomplete="off">
+            <datalist id="spisakProizvoda"></datalist>
+          </div>
+          <div>
+            <label for="poljeKolicina">Količina (kom.)</label>
+            <input type="number" id="poljeKolicina" name="kolicina" min="1" step="1" value="1" inputmode="numeric">
+          </div>
+          <div>
+            <label for="poljeDatum">Datum prodaje</label>
+            <input type="date" id="poljeDatum" name="datum">
+          </div>
+          <div>
+            <label for="poljeNabavna">Nabavna cena po komadu (RSD)</label>
+            <input type="number" id="poljeNabavna" name="nabavna" min="0" step="1" inputmode="decimal" placeholder="0">
+          </div>
+          <div>
+            <label for="poljeProdajna">Prodajna cena po komadu (RSD)</label>
+            <input type="number" id="poljeProdajna" name="prodajna" min="0" step="1" inputmode="decimal" placeholder="0">
+          </div>
+        </div>
+        <p class="pregled-zarade" id="pregledZarade">Zarada na ovoj prodaji: 0 RSD</p>
+        <p class="poruka sakrij" id="porukaForme" role="status" aria-live="polite"></p>
+        <div style="margin-top:var(--razmak-2)">
+          <button type="submit" class="dugme dugme--puno">✅ Sačuvaj prodaju</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section aria-labelledby="naslovLista">
+    <h2 id="naslovLista">🧾 Unete prodaje</h2>
+    <div class="kartica">
+      <ul class="lista" id="listaProdaja"></ul>
+      <p class="prazno" id="prazneProdaje">
+        Ovde će se nizati sve prodaje iz izabranog meseca.
+      </p>
+      <div class="alatke" style="margin-top:var(--razmak-2)">
+        <button type="button" class="dugme dugme--sporedno" id="dugmePrimer">🧪 Ubaci primer podataka</button>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="naslovKopija" id="sekcijaNalog">
+    <h2 id="naslovKopija">☁️ Nalog i čuvanje podataka</h2>
+
+    <div class="kartica" id="korakPodesavanje">
+      <h3>Prvo podešavanje — radi se jednom</h3>
+      <p style="margin-top:0;max-width:70ch">Napravi svoj besplatan privatni prostor za podatke. Traje oko 5 minuta i ne plaća se ništa.</p>
+      <ol class="koraci">
+        <li>Otvori <strong>supabase.com</strong> i napravi nalog (može preko Google naloga).</li>
+        <li>Klikni <strong>New project</strong>, daj mu ime <strong>zarada</strong>, izmisli lozinku baze i sačuvaj je negde. Sačekaj minut-dva da se napravi.</li>
+        <li>Sa leve strane otvori <strong>SQL Editor</strong>, nalepi tekst ispod (dugme „Kopiraj") i klikni <strong>Run</strong>.</li>
+        <li>Sa leve strane otvori <strong>Project Settings → API</strong> i prekopiraj dve stvari u polja ispod: <strong>Project URL</strong> i ključ <strong>anon public</strong>.</li>
+      </ol>
+      <details>
+        <summary>Tekst za SQL Editor (klikni da vidiš)</summary>
+        <div class="sql-kutija" id="sqlTekst">create table if not exists public.prodaje (
+  id bigint primary key,
+  user_id uuid not null default auth.uid() references auth.users on delete cascade,
+  proizvod text not null,
+  kolicina numeric not null,
+  nabavna numeric not null,
+  prodajna numeric not null,
+  datum date not null,
+  created_at timestamptz default now()
+);
+
+alter table public.prodaje enable row level security;
+
+create policy "samo svoje" on public.prodaje
+  for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);</div>
+        <button type="button" class="dugme dugme--sporedno" id="dugmeKopirajSql">📋 Kopiraj</button>
+      </details>
+      <div class="polja">
+        <div class="polje--siroko">
+          <label for="poljeUrl">Project URL</label>
+          <input type="url" id="poljeUrl" placeholder="https://nesto.supabase.co" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="polje--siroko">
+          <label for="poljeKljuc">Ključ „anon public"</label>
+          <input type="text" id="poljeKljuc" placeholder="eyJhbGciOi..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <div style="margin-top:var(--razmak-2)">
+        <button type="button" class="dugme dugme--puno" id="dugmeSacuvajPodesavanje">✅ Sačuvaj podešavanje</button>
+      </div>
+    </div>
+
+    <div class="kartica sakrij" id="korakPrijava">
+      <h3>Prijavi se</h3>
+      <p style="margin-top:0;max-width:70ch">Ovim mejlom i lozinkom ulaziš u svoju aplikaciju sa bilo kog uređaja. Prvi put klikni „Napravi nalog".</p>
+      <div class="polja">
+        <div class="polje--siroko">
+          <label for="poljeMejl">Tvoj mejl</label>
+          <input type="email" id="poljeMejl" autocomplete="username" spellcheck="false">
+        </div>
+        <div class="polje--siroko">
+          <label for="poljeLozinka">Lozinka (bar 6 znakova)</label>
+          <input type="password" id="poljeLozinka" autocomplete="current-password">
+        </div>
+      </div>
+      <div class="alatke" style="margin-top:var(--razmak-2)">
+        <button type="button" class="dugme" id="dugmePrijava">🔑 Prijavi se</button>
+        <button type="button" class="dugme dugme--sporedno" id="dugmeRegistracija">🆕 Napravi nalog</button>
+        <button type="button" class="dugme dugme--sporedno" id="dugmePromeniPodesavanje" aria-controls="korakPodesavanje" aria-expanded="false">✏️ Promeni URL i ključ</button>
+      </div>
+    </div>
+
+    <div class="kartica sakrij" id="korakUlogovan">
+      <h3>Prijavljen si</h3>
+      <p style="margin-top:0" id="prikazMejla">—</p>
+      <p class="stat-dodatak" id="prikazSinhronizacije">Sve je sačuvano.</p>
+      <div class="alatke" style="margin-top:var(--razmak-2)">
+        <button type="button" class="dugme dugme--sporedno" id="dugmeSinhronizuj">🔄 Sinhronizuj sada</button>
+        <button type="button" class="dugme dugme--sporedno" id="dugmeOdjava">🚪 Odjavi se</button>
+      </div>
+    </div>
+
+    <p class="poruka sakrij" id="porukaNaloga" role="status" aria-live="polite"></p>
+
+    <div class="kartica" style="margin-top:var(--razmak-2)">
+      <h3>💾 Kopija na uređaju</h3>
+      <p style="margin-top:0;max-width:70ch">Nije obavezna kad koristiš nalog, ali može da posluži za arhivu ili prebacivanje podataka.</p>
+      <div class="alatke">
+        <button type="button" class="dugme dugme--sporedno" id="dugmeIzvoz">⬇️ Sačuvaj kopiju</button>
+        <label for="poljeUvoz" class="dugme dugme--sporedno" style="margin:0">⬆️ Vrati iz kopije</label>
+        <input type="file" id="poljeUvoz" accept="application/json,.json" class="sakrij">
+        <button type="button" class="dugme dugme--sporedno" id="dugmeBrisiSve">🗑️ Obriši sve</button>
+      </div>
+      <p class="poruka sakrij" id="porukaKopije" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="omot">
+    <p>Moja zarada — sve u dinarima (RSD). <span id="godina"></span></p>
+    <p id="statusCuvanja">Podaci se čuvaju automatski na ovom uređaju.</p>
+  </div>
+</footer>
+
+<div id="izvod" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var KLJUC = "moja-zarada-prodaje-v1";
+  var MESECI = ["januar","februar","mart","april","maj","jun","jul","avgust","septembar","oktobar","novembar","decembar"];
+
+  /* ---------- čuvanje podataka ---------- */
+  var uMemoriji = null;
+  var localnoRadi = (function(){
+    try { window.localStorage.setItem("__test__","1"); window.localStorage.removeItem("__test__"); return true; }
+    catch(e){ return false; }
+  })();
+
+  function ucitaj(){
+    if(!localnoRadi){ return uMemoriji ? uMemoriji.slice() : []; }
+    try {
+      var sirovo = window.localStorage.getItem(KLJUC);
+      if(!sirovo){ return []; }
+      var niz = JSON.parse(sirovo);
+      return Array.isArray(niz) ? niz : [];
+    } catch(e){ return []; }
+  }
+  function sacuvaj(niz){
+    uMemoriji = niz.slice();
+    if(!localnoRadi){ return false; }
+    try { window.localStorage.setItem(KLJUC, JSON.stringify(niz)); return true; }
+    catch(e){ return false; }
+  }
+
+  var prodaje = ucitaj();
+  var danas = new Date();
+  var izabranaGodina = danas.getFullYear();
+  var izabraniMesec = danas.getMonth();
+
+  /* ---------- pomoćne funkcije ---------- */
+  function dinara(broj){
+    var zaokruzeno = Math.round(broj);
+    var minus = zaokruzeno < 0;
+    var cifre = String(Math.abs(zaokruzeno));
+    var izlaz = "";
+    for(var i = 0; i < cifre.length; i++){
+      if(i > 0 && (cifre.length - i) % 3 === 0){ izlaz += "."; }
+      izlaz += cifre.charAt(i);
+    }
+    return (minus ? "−" : "") + izlaz + " RSD";
+  }
+  function dvocifra(n){ return (n < 10 ? "0" : "") + n; }
+  function kljucDatuma(d){ return d.getFullYear() + "-" + dvocifra(d.getMonth()+1) + "-" + dvocifra(d.getDate()); }
+  function lepDatum(iso){
+    var d = iso.split("-");
+    return Number(d[2]) + ". " + MESECI[Number(d[1])-1];
+  }
+  function zaradaStavke(s){ return (s.prodajna - s.nabavna) * s.kolicina; }
+  function prometStavke(s){ return s.prodajna * s.kolicina; }
+  function trosakStavke(s){ return s.nabavna * s.kolicina; }
+  function uMesecu(s){
+    var d = s.datum.split("-");
+    return Number(d[0]) === izabranaGodina && Number(d[1]) - 1 === izabraniMesec;
+  }
+  function el(id){ return document.getElementById(id); }
+  function tekst(id, vrednost){ el(id).textContent = vrednost; }
+
+  /* ---------- prikaz: danas ---------- */
+  function osveziDanas(){
+    var danasIso = kljucDatuma(new Date());
+    var zarada = 0, promet = 0, komada = 0;
+    prodaje.forEach(function(s){
+      if(s.datum === danasIso){ zarada += zaradaStavke(s); promet += prometStavke(s); komada += s.kolicina; }
+    });
+    var poljeZarada = el("zaradaDanas");
+    poljeZarada.textContent = dinara(zarada);
+    poljeZarada.className = "stat-broj veliki " + (zarada < 0 ? "minus" : (zarada > 0 ? "plus" : ""));
+    tekst("prometDanas", dinara(promet));
+    tekst("detaljDanas", komada === 0 ? "Danas još nema prodaja" : "Prodato " + komada + " kom.");
+  }
+
+  /* ---------- prikaz: mesec ---------- */
+  function osveziMesec(){
+    tekst("imeMeseca", MESECI[izabraniMesec] + " " + izabranaGodina);
+    var stavke = prodaje.filter(uMesecu);
+    var zarada = 0, promet = 0, trosak = 0;
+    stavke.forEach(function(s){ zarada += zaradaStavke(s); promet += prometStavke(s); trosak += trosakStavke(s); });
+
+    var poljeZarada = el("zaradaMeseca");
+    poljeZarada.textContent = dinara(zarada);
+    poljeZarada.className = "stat-broj " + (zarada < 0 ? "minus" : (zarada > 0 ? "plus" : ""));
+    tekst("prometMeseca", dinara(promet));
+    tekst("troskoviMeseca", dinara(trosak));
+    tekst("marzaMeseca", promet > 0 ? Math.round(zarada / promet * 100) + "%" : "—");
+
+    nacrtajGrafikon(stavke);
+    osveziProizvode(stavke);
+    osveziListu(stavke);
+  }
+
+  /* ---------- grafikon ---------- */
+  function nacrtajGrafikon(stavke){
+    var brojDana = new Date(izabranaGodina, izabraniMesec + 1, 0).getDate();
+    var poDanu = [];
+    var i;
+    for(i = 0; i < brojDana; i++){ poDanu.push(0); }
+    stavke.forEach(function(s){
+      var dan = Number(s.datum.split("-")[2]);
+      poDanu[dan-1] += zaradaStavke(s);
+    });
+
+    var maxPlus = 0, maxMinus = 0;
+    poDanu.forEach(function(v){
+      if(v > maxPlus){ maxPlus = v; }
+      if(v < maxMinus){ maxMinus = v; }
+    });
+    var imaMinus = maxMinus < 0;
+    var gore = el("grafikonPlus"), dole = el("grafikonMinus"), osa = el("osaDana");
+    gore.innerHTML = ""; dole.innerHTML = ""; osa.innerHTML = "";
+    dole.className = imaMinus ? "grafikon" : "grafikon sakrij";
+
+    for(i = 0; i < brojDana; i++){
+      var v = poDanu[i];
+      var omot = document.createElement("div");
+      omot.className = "stub-omot";
+      var stub = document.createElement("div");
+      stub.className = "stub";
+      stub.style.height = (v > 0 && maxPlus > 0) ? Math.max(3, v / maxPlus * 100) + "%" : "0";
+      stub.title = (i+1) + ". " + MESECI[izabraniMesec] + ": " + dinara(v);
+      omot.appendChild(stub);
+      gore.appendChild(omot);
+
+      var omotM = document.createElement("div");
+      omotM.className = "stub-omot stub-omot--minus";
+      var stubM = document.createElement("div");
+      stubM.className = "stub stub--minus";
+      stubM.style.height = (v < 0 && maxMinus < 0) ? Math.max(3, v / maxMinus * 100) + "%" : "0";
+      stubM.title = (i+1) + ". " + MESECI[izabraniMesec] + ": " + dinara(v);
+      omotM.appendChild(stubM);
+      dole.appendChild(omotM);
+
+      var oznaka = document.createElement("span");
+      var dan = i + 1;
+      oznaka.textContent = (dan === 1 || dan % 5 === 0 || dan === brojDana) ? String(dan) : "";
+      osa.appendChild(oznaka);
+    }
+
+    var najbolji = 0, najboljiDan = 0;
+    for(i = 0; i < brojDana; i++){
+      if(poDanu[i] > najbolji){ najbolji = poDanu[i]; najboljiDan = i + 1; }
+    }
+    tekst("najboljiDan", najboljiDan
+      ? "🥇 Najbolji dan: " + najboljiDan + ". " + MESECI[izabraniMesec] + " — " + dinara(najbolji)
+      : "Nema prodaja u ovom mesecu.");
+  }
+
+  /* ---------- po proizvodu ---------- */
+  function osveziProizvode(stavke){
+    var mapa = {};
+    stavke.forEach(function(s){
+      var ime = s.proizvod;
+      if(!mapa[ime]){ mapa[ime] = { ime: ime, kom: 0, promet: 0, zarada: 0, trosak: 0 }; }
+      mapa[ime].kom += s.kolicina;
+      mapa[ime].promet += prometStavke(s);
+      mapa[ime].zarada += zaradaStavke(s);
+      mapa[ime].trosak += trosakStavke(s);
+    });
+    var niz = Object.keys(mapa).map(function(k){ return mapa[k]; });
+    niz.sort(function(a,b){ return b.zarada - a.zarada; });
+
+    var telo = el("telotabele"), podnozje = el("podnozjeTabele");
+    telo.innerHTML = ""; podnozje.innerHTML = "";
+    el("prazniProizvodi").className = niz.length ? "prazno sakrij" : "prazno";
+
+    var ukupnoKom = 0, ukupnoPromet = 0, ukupnoZarada = 0;
+    niz.forEach(function(p, indeks){
+      var red = document.createElement("tr");
+      var medalja = indeks === 0 ? "🥇 " : (indeks === 1 ? "🥈 " : (indeks === 2 ? "🥉 " : ""));
+      var celije = [
+        medalja + p.ime,
+        String(p.kom),
+        dinara(p.promet),
+        dinara(p.zarada),
+        p.promet > 0 ? Math.round(p.zarada / p.promet * 100) + "%" : "—"
+      ];
+      celije.forEach(function(vrednost, i){
+        var td = document.createElement("td");
+        td.textContent = vrednost;
+        if(i === 3 && p.zarada < 0){ td.className = "minus"; }
+        red.appendChild(td);
+      });
+      telo.appendChild(red);
+      ukupnoKom += p.kom; ukupnoPromet += p.promet; ukupnoZarada += p.zarada;
+    });
+
+    if(niz.length){
+      var redU = document.createElement("tr");
+      ["Ukupno", String(ukupnoKom), dinara(ukupnoPromet), dinara(ukupnoZarada),
+       ukupnoPromet > 0 ? Math.round(ukupnoZarada / ukupnoPromet * 100) + "%" : "—"].forEach(function(v){
+        var td = document.createElement("td");
+        td.textContent = v;
+        redU.appendChild(td);
+      });
+      podnozje.appendChild(redU);
+    }
+
+    var najskuplji = null;
+    niz.forEach(function(p){ if(!najskuplji || p.trosak > najskuplji.trosak){ najskuplji = p; } });
+    tekst("najvegiTrosak", najskuplji ? najskuplji.ime : "—");
+    tekst("najvegiTrosakIznos", najskuplji
+      ? dinara(najskuplji.trosak) + " potrošeno na nabavku u ovom mesecu"
+      : "Za izabrani mesec nema unosa.");
+
+    var spisak = el("spisakProizvoda");
+    spisak.innerHTML = "";
+    var vidjeni = {};
+    prodaje.forEach(function(s){
+      if(!vidjeni[s.proizvod]){
+        vidjeni[s.proizvod] = true;
+        var opcija = document.createElement("option");
+        opcija.value = s.proizvod;
+        spisak.appendChild(opcija);
+      }
+    });
+  }
+
+  /* ---------- lista prodaja ---------- */
+  function osveziListu(stavke){
+    var lista = el("listaProdaja");
+    lista.innerHTML = "";
+    var kopija = stavke.slice().sort(function(a,b){
+      return a.datum === b.datum ? b.id - a.id : (a.datum < b.datum ? 1 : -1);
+    });
+    el("prazneProdaje").className = kopija.length ? "prazno sakrij" : "prazno";
+
+    kopija.forEach(function(s){
+      var li = document.createElement("li");
+
+      var glavno = document.createElement("div");
+      glavno.className = "stavka-glavno";
+      var naziv = document.createElement("p");
+      naziv.className = "stavka-naziv";
+      naziv.textContent = s.proizvod;
+      var detalj = document.createElement("p");
+      detalj.className = "stavka-detalj";
+      detalj.textContent = lepDatum(s.datum) + " · " + s.kolicina + " kom. · nabavna " +
+        dinara(s.nabavna) + " → prodajna " + dinara(s.prodajna);
+      glavno.appendChild(naziv);
+      glavno.appendChild(detalj);
+
+      var iznos = document.createElement("div");
+      var z = zaradaStavke(s);
+      iznos.className = "stavka-iznos " + (z < 0 ? "minus" : "plus");
+      iznos.textContent = (z >= 0 ? "+" : "") + dinara(z);
+
+      var brisi = document.createElement("button");
+      brisi.type = "button";
+      brisi.className = "brisi";
+      brisi.textContent = "🗑️";
+      brisi.setAttribute("aria-label", "Obriši prodaju: " + s.proizvod + ", " + lepDatum(s.datum));
+      brisi.addEventListener("click", function(){
+        if(window.confirm("Da obrišem ovu prodaju?\n" + s.proizvod + " — " + lepDatum(s.datum))){
+          prodaje = prodaje.filter(function(x){ return x.id !== s.id; });
+          sacuvaj(prodaje);
+          naRedBrisanje(s.id);
+          sinhronizuj(true);
+          osveziSve();
+        }
+      });
+
+      li.appendChild(glavno);
+      li.appendChild(iznos);
+      li.appendChild(brisi);
+      lista.appendChild(li);
+    });
+  }
+
+  function osveziSve(){ osveziDanas(); osveziMesec(); }
+
+  /* ---------- nalog i sinhronizacija ---------- */
+  var KLJUC_NALOG = "moja-zarada-nalog-v1";
+  var KLJUC_SESIJA = "moja-zarada-sesija-v1";
+  var KLJUC_CEKA = "moja-zarada-ceka-v1";
+
+  function uzmiObjekat(kljuc, podrazumevano){
+    if(!localnoRadi){ return podrazumevano; }
+    try {
+      var t = window.localStorage.getItem(kljuc);
+      return t ? JSON.parse(t) : podrazumevano;
+    } catch(e){ return podrazumevano; }
+  }
+  function upisiObjekat(kljuc, vrednost){
+    if(!localnoRadi){ return; }
+    try { window.localStorage.setItem(kljuc, JSON.stringify(vrednost)); } catch(e){}
+  }
+
+  var nalog = uzmiObjekat(KLJUC_NALOG, null);
+  var sesija = uzmiObjekat(KLJUC_SESIJA, null);
+  var ceka = uzmiObjekat(KLJUC_CEKA, { slanje: [], brisanje: [] });
+  if(!ceka.slanje){ ceka.slanje = []; }
+  if(!ceka.brisanje){ ceka.brisanje = []; }
+  var sinhronizacijaUToku = false;
+
+  function upisiCeka(){ upisiObjekat(KLJUC_CEKA, ceka); }
+  function naRed(id){
+    if(ceka.slanje.indexOf(id) === -1){ ceka.slanje.push(id); }
+    upisiCeka();
+  }
+  function naRedBrisanje(id){
+    ceka.slanje = ceka.slanje.filter(function(x){ return x !== id; });
+    if(ceka.brisanje.indexOf(id) === -1){ ceka.brisanje.push(id); }
+    upisiCeka();
+  }
+
+  function ulogovan(){ return !!(nalog && nalog.url && nalog.kljuc && sesija && sesija.access_token); }
+
+  function postaviStatus(ikona, tekstStatusa){
+    el("ikonaStatusa").textContent = ikona;
+    el("tekstStatusa").textContent = tekstStatusa;
+  }
+  function osveziStatus(){
+    var ceka_ukupno = ceka.slanje.length + ceka.brisanje.length;
+    if(!nalog){
+      postaviStatus("📱", "Podaci se čuvaju na ovom uređaju");
+      el("dugmeNalog").textContent = "Podesi nalog";
+    } else if(!ulogovan()){
+      postaviStatus("🔒", "Prijavi se da se podaci čuvaju na nalogu");
+      el("dugmeNalog").textContent = "Prijavi se";
+    } else if(sinhronizacijaUToku){
+      postaviStatus("🔄", "Sinhronizujem…");
+      el("dugmeNalog").textContent = "Nalog";
+    } else if(ceka_ukupno > 0){
+      postaviStatus("📴", "Čeka slanje: " + ceka_ukupno + " izmena");
+      el("dugmeNalog").textContent = "Pošalji";
+    } else {
+      postaviStatus("☁️", "Sačuvano na nalogu");
+      el("dugmeNalog").textContent = "Nalog";
+    }
+    el("korakPodesavanje").className = nalog ? "kartica sakrij" : "kartica";
+    el("dugmePromeniPodesavanje").setAttribute("aria-expanded", nalog ? "false" : "true");
+    el("korakPrijava").className = (nalog && !ulogovan()) ? "kartica" : "kartica sakrij";
+    el("korakUlogovan").className = ulogovan() ? "kartica" : "kartica sakrij";
+    if(ulogovan()){
+      tekst("prikazMejla", "📧 " + (sesija.email || "tvoj nalog"));
+      tekst("prikazSinhronizacije", ceka_ukupno > 0
+        ? "Čeka da se pošalje: " + ceka_ukupno + " izmena."
+        : "Sve je sačuvano na nalogu.");
+    }
+  }
+
+  function zahtev(putanja, opcije){
+    opcije = opcije || {};
+    var zaglavlja = opcije.headers || {};
+    zaglavlja["apikey"] = nalog.kljuc;
+    zaglavlja["Content-Type"] = "application/json";
+    if(sesija && sesija.access_token && !opcije.bezTokena){
+      zaglavlja["Authorization"] = "Bearer " + sesija.access_token;
+    }
+    return window.fetch(nalog.url.replace(/\/+$/, "") + putanja, {
+      method: opcije.method || "GET",
+      headers: zaglavlja,
+      body: opcije.body ? JSON.stringify(opcije.body) : undefined
+    }).then(function(odgovor){
+      return odgovor.text().then(function(t){
+        var telo = null;
+        try { telo = t ? JSON.parse(t) : null; } catch(e){ telo = null; }
+        if(!odgovor.ok){
+          var greska = new Error((telo && (telo.msg || telo.message || telo.error_description || telo.error)) || ("Greška " + odgovor.status));
+          greska.status = odgovor.status;
+          throw greska;
+        }
+        return telo;
+      });
+    });
+  }
+
+  function sacuvajSesiju(podaci, mejl){
+    sesija = {
+      access_token: podaci.access_token,
+      refresh_token: podaci.refresh_token,
+      istice: Date.now() + ((podaci.expires_in || 3600) * 1000),
+      email: (podaci.user && podaci.user.email) || mejl
+    };
+    upisiObjekat(KLJUC_SESIJA, sesija);
+  }
+
+  function osveziToken(){
+    if(!sesija || !sesija.refresh_token){ return Promise.reject(new Error("nema sesije")); }
+    return zahtev("/auth/v1/token?grant_type=refresh_token", {
+      method: "POST", bezTokena: true, body: { refresh_token: sesija.refresh_token }
+    }).then(function(podaci){
+      sacuvajSesiju(podaci, sesija.email);
+      return true;
+    });
+  }
+
+  function osiguranToken(){
+    if(!sesija){ return Promise.reject(new Error("nema sesije")); }
+    if(sesija.istice && Date.now() < sesija.istice - 60000){ return Promise.resolve(true); }
+    return osveziToken();
+  }
+
+  function redZaServer(s){
+    return { id: s.id, proizvod: s.proizvod, kolicina: s.kolicina,
+             nabavna: s.nabavna, prodajna: s.prodajna, datum: s.datum };
+  }
+
+  function sinhronizuj(tiho){
+    if(!ulogovan() || sinhronizacijaUToku){ return Promise.resolve(false); }
+    sinhronizacijaUToku = true;
+    osveziStatus();
+
+    return osiguranToken().then(function(){
+      var zaSlanje = ceka.slanje
+        .map(function(id){
+          var nadjeno = null;
+          prodaje.forEach(function(s){ if(s.id === id){ nadjeno = s; } });
+          return nadjeno ? redZaServer(nadjeno) : null;
+        })
+        .filter(function(x){ return x; });
+      if(!zaSlanje.length){ return null; }
+      return zahtev("/rest/v1/prodaje", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=minimal" },
+        body: zaSlanje
+      });
+    }).then(function(){
+      if(!ceka.brisanje.length){ return null; }
+      return zahtev("/rest/v1/prodaje?id=in.(" + ceka.brisanje.join(",") + ")", {
+        method: "DELETE", headers: { "Prefer": "return=minimal" }
+      });
+    }).then(function(){
+      ceka = { slanje: [], brisanje: [] };
+      upisiCeka();
+      return zahtev("/rest/v1/prodaje?select=id,proizvod,kolicina,nabavna,prodajna,datum&order=datum.desc");
+    }).then(function(sa_servera){
+      if(Array.isArray(sa_servera)){
+        prodaje = sa_servera.map(function(r){
+          return { id: Number(r.id), proizvod: r.proizvod, kolicina: Number(r.kolicina),
+                   nabavna: Number(r.nabavna), prodajna: Number(r.prodajna), datum: r.datum };
+        });
+        sacuvaj(prodaje);
+        osveziSve();
+      }
+      sinhronizacijaUToku = false;
+      osveziStatus();
+      if(!tiho){ poruka("porukaNaloga", "✅ Sve je sinhronizovano.", false); }
+      return true;
+    })["catch"](function(greska){
+      sinhronizacijaUToku = false;
+      osveziStatus();
+      if(!tiho){
+        poruka("porukaNaloga", "⚠️ Nije uspelo: " + greska.message +
+          " Podaci su sačuvani na uređaju i poslaće se kasnije.", true);
+      }
+      return false;
+    });
+  }
+
+  el("dugmeSacuvajPodesavanje").addEventListener("click", function(){
+    var url = el("poljeUrl").value.trim();
+    var kljuc = el("poljeKljuc").value.trim();
+    if(!/^https:\/\/.+/.test(url)){ poruka("porukaNaloga", "⚠️ Project URL mora počinjati sa https://", true); return; }
+    if(kljuc.length < 20){ poruka("porukaNaloga", "⚠️ Ključ ne izgleda ispravno.", true); return; }
+    nalog = { url: url, kljuc: kljuc };
+    upisiObjekat(KLJUC_NALOG, nalog);
+    osveziStatus();
+    poruka("porukaNaloga", "✅ Sačuvano. Sad napravi nalog mejlom i lozinkom.", false);
+    el("poljeMejl").focus();
+  });
+
+  el("dugmePromeniPodesavanje").addEventListener("click", function(){
+    el("poljeUrl").value = nalog ? nalog.url : "";
+    el("poljeKljuc").value = nalog ? nalog.kljuc : "";
+    nalog = null;
+    upisiObjekat(KLJUC_NALOG, null);
+    osveziStatus();
+  });
+
+  function prijaviSe(nova){
+    var mejl = el("poljeMejl").value.trim();
+    var lozinka = el("poljeLozinka").value;
+    if(!mejl || mejl.indexOf("@") === -1){ poruka("porukaNaloga", "⚠️ Upiši ispravan mejl.", true); return; }
+    if(lozinka.length < 6){ poruka("porukaNaloga", "⚠️ Lozinka mora imati bar 6 znakova.", true); return; }
+    var putanja = nova ? "/auth/v1/signup" : "/auth/v1/token?grant_type=password";
+    zahtev(putanja, { method: "POST", bezTokena: true, body: { email: mejl, password: lozinka } })
+      .then(function(podaci){
+        if(!podaci || !podaci.access_token){
+          poruka("porukaNaloga", "📧 Poslali smo ti mejl za potvrdu. Klikni na link u mejlu, pa se onda prijavi.", false);
+          return;
+        }
+        sacuvajSesiju(podaci, mejl);
+        el("poljeLozinka").value = "";
+        osveziStatus();
+        prodaje.forEach(function(s){ naRed(s.id); });
+        sinhronizuj(false);
+      })["catch"](function(greska){
+        poruka("porukaNaloga", "⚠️ " + greska.message, true);
+      });
+  }
+  el("dugmePrijava").addEventListener("click", function(){ prijaviSe(false); });
+  el("dugmeRegistracija").addEventListener("click", function(){ prijaviSe(true); });
+  el("dugmeSinhronizuj").addEventListener("click", function(){ sinhronizuj(false); });
+
+  el("dugmeOdjava").addEventListener("click", function(){
+    if(!window.confirm("Odjaviti se? Podaci ostaju na nalogu, vraćaš ih kad se ponovo prijaviš.")){ return; }
+    sesija = null;
+    upisiObjekat(KLJUC_SESIJA, null);
+    osveziStatus();
+  });
+
+  el("dugmeNalog").addEventListener("click", function(){
+    if(ulogovan() && (ceka.slanje.length + ceka.brisanje.length) > 0){ sinhronizuj(false); }
+    el("sekcijaNalog").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  el("dugmeKopirajSql").addEventListener("click", function(){
+    var t = el("sqlTekst").textContent;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){
+        poruka("porukaNaloga", "✅ Kopirano — nalepi u SQL Editor i klikni Run.", false);
+      })["catch"](function(){
+        poruka("porukaNaloga", "Označi tekst prstom pa kopiraj ručno.", true);
+      });
+    } else {
+      poruka("porukaNaloga", "Označi tekst prstom pa kopiraj ručno.", true);
+    }
+  });
+
+  window.addEventListener("online", function(){ sinhronizuj(true); });
+
+  /* ---------- mesečni izvod za PDF ---------- */
+  function bezHtml(t){
+    return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function skupiZa(godina, mesec){
+    var stavke = prodaje.filter(function(s){
+      var d = s.datum.split("-");
+      return Number(d[0]) === godina && Number(d[1]) - 1 === mesec;
+    });
+    var brojDana = new Date(godina, mesec + 1, 0).getDate();
+    var poDanu = [], i;
+    for(i = 0; i < brojDana; i++){ poDanu.push(0); }
+    var promet = 0, trosak = 0, zarada = 0, komada = 0, mapa = {};
+    stavke.forEach(function(s){
+      promet += prometStavke(s); trosak += trosakStavke(s);
+      zarada += zaradaStavke(s); komada += s.kolicina;
+      poDanu[Number(s.datum.split("-")[2]) - 1] += zaradaStavke(s);
+      if(!mapa[s.proizvod]){ mapa[s.proizvod] = { ime:s.proizvod, kom:0, promet:0, trosak:0, zarada:0 }; }
+      mapa[s.proizvod].kom += s.kolicina;
+      mapa[s.proizvod].promet += prometStavke(s);
+      mapa[s.proizvod].trosak += trosakStavke(s);
+      mapa[s.proizvod].zarada += zaradaStavke(s);
+    });
+    var proizvodi = Object.keys(mapa).map(function(k){ return mapa[k]; });
+    proizvodi.sort(function(a,b){ return b.zarada - a.zarada; });
+    var danaSaProdajom = 0;
+    poDanu.forEach(function(v){ if(v !== 0){ danaSaProdajom++; } });
+    return {
+      stavke: stavke, poDanu: poDanu, brojDana: brojDana, proizvodi: proizvodi,
+      promet: promet, trosak: trosak, zarada: zarada, komada: komada,
+      brojProdaja: stavke.length, danaSaProdajom: danaSaProdajom,
+      marza: promet > 0 ? zarada / promet * 100 : 0
+    };
+  }
+
+  function analiza(sada, pre, imeMeseca, imePrethodnog){
+    var redovi = [];
+    redovi.push("Ostvaren je promet od <strong>" + dinara(sada.promet) + "</strong>, uz nabavnu vrednost robe od " +
+      dinara(sada.trosak) + ", što daje neto zaradu od <strong>" + dinara(sada.zarada) +
+      "</strong> (marža " + Math.round(sada.marza) + "%).");
+
+    if(pre.brojProdaja > 0){
+      var razlika = sada.zarada - pre.zarada;
+      var procenat = pre.zarada !== 0 ? Math.round(Math.abs(razlika) / Math.abs(pre.zarada) * 100) : 0;
+      if(razlika > 0){
+        redovi.push("U odnosu na " + imePrethodnog + " (" + dinara(pre.zarada) + "), zarada je veća za " +
+          dinara(razlika) + (procenat ? " odnosno " + procenat + "%" : "") + ". 📈");
+      } else if(razlika < 0){
+        redovi.push("U odnosu na " + imePrethodnog + " (" + dinara(pre.zarada) + "), zarada je manja za " +
+          dinara(Math.abs(razlika)) + (procenat ? " odnosno " + procenat + "%" : "") + ". 📉");
+      } else {
+        redovi.push("Zarada je ista kao u mesecu " + imePrethodnog + ".");
+      }
+    } else {
+      redovi.push("Za " + imePrethodnog + " nema unetih prodaja, pa poređenje sa prethodnim mesecom nije moguće.");
+    }
+
+    var n = sada.brojProdaja;
+    var zadnja = n % 10, zadnje2 = n % 100;
+    var recProdaja = (zadnja === 1 && zadnje2 !== 11) ? "prodaju"
+      : ((zadnja >= 2 && zadnja <= 4 && (zadnje2 < 12 || zadnje2 > 14)) ? "prodaje" : "prodaja");
+    redovi.push("Prodato je " + sada.komada + " kom. kroz " + n + " " + recProdaja + ", prosečno " +
+      dinara(sada.zarada / Math.max(1, sada.brojProdaja)) + " zarade po prodaji.");
+
+    redovi.push("Prodaje je bilo u " + sada.danaSaProdajom + " od " + sada.brojDana +
+      " dana, prosečno " + dinara(sada.zarada / Math.max(1, sada.danaSaProdajom)) + " po danu sa prometom.");
+
+    var najbolji = 0, najboljiDan = 0;
+    sada.poDanu.forEach(function(v, i){ if(v > najbolji){ najbolji = v; najboljiDan = i + 1; } });
+    if(najboljiDan){
+      redovi.push("Najjači dan bio je " + najboljiDan + ". " + imeMeseca.split(" ")[0] +
+        " sa zaradom od " + dinara(najbolji) + ".");
+    }
+
+    if(sada.proizvodi.length){
+      var prvi = sada.proizvodi[0];
+      var udeo = sada.zarada > 0 ? Math.round(prvi.zarada / sada.zarada * 100) : 0;
+      redovi.push("Najviše zarade donosi <strong>" + bezHtml(prvi.ime) + "</strong> — " + dinara(prvi.zarada) +
+        (udeo ? ", što je " + udeo + "% ukupne zarade" : "") + ".");
+      if(udeo >= 60 && sada.proizvodi.length > 1){
+        redovi.push("Napomena: veliki deo zarade zavisi od jednog proizvoda. Ako on stane, stane i mesec — vredi razmisliti o širenju ponude.");
+      }
+    }
+
+    var slabi = sada.proizvodi.filter(function(p){
+      return p.promet > 0 && (p.zarada / p.promet * 100) < 15;
+    });
+    if(slabi.length){
+      var imena = slabi.map(function(p){ return bezHtml(p.ime) + " (" + Math.round(p.zarada / p.promet * 100) + "%)"; });
+      redovi.push("Slaba marža: " + imena.join(", ") + ". Na ovome se radi puno za malo para — proveri nabavnu ili podigni cenu.");
+    }
+    if(sada.zarada < 0){
+      redovi.push("Mesec je završen u minusu. Prodajne cene su ispod nabavnih na delu robe.");
+    }
+    if(sada.proizvodi.length > 1){
+      var najmarza = sada.proizvodi.slice().sort(function(a,b){
+        return (b.promet ? b.zarada/b.promet : 0) - (a.promet ? a.zarada/a.promet : 0);
+      })[0];
+      if(najmarza.promet > 0){
+        redovi.push("Najbolju maržu ima <strong>" + bezHtml(najmarza.ime) + "</strong> — " +
+          Math.round(najmarza.zarada / najmarza.promet * 100) + "%. Ovo je proizvod na koji vredi gurati.");
+      }
+    }
+    return redovi;
+  }
+
+  function napraviIzvod(){
+    var sada = skupiZa(izabranaGodina, izabraniMesec);
+    if(sada.brojProdaja === 0){
+      window.alert("Za " + MESECI[izabraniMesec] + " " + izabranaGodina + ". nema unetih prodaja, pa nema šta da uđe u izvod.");
+      return;
+    }
+    var pretG = izabraniMesec === 0 ? izabranaGodina - 1 : izabranaGodina;
+    var pretM = izabraniMesec === 0 ? 11 : izabraniMesec - 1;
+    var pre = skupiZa(pretG, pretM);
+    var imeMeseca = MESECI[izabraniMesec] + " " + izabranaGodina + ".";
+    var imePrethodnog = MESECI[pretM] + " " + pretG + ".";
+
+    var h = "";
+    h += '<div class="izvod-vrh">';
+    h += '<h2>Izvod zarade — ' + imeMeseca + '</h2>';
+    h += '<p class="izvod-podnaslov">Pregled prodaje, troškova nabavke i zarade · svi iznosi u dinarima (RSD)</p>';
+    h += '</div>';
+
+    h += '<div class="izvod-mreza">';
+    h += '<div class="izvod-kutija"><p class="izvod-oznaka">Promet</p><p class="izvod-broj">' + dinara(sada.promet) + '</p></div>';
+    h += '<div class="izvod-kutija"><p class="izvod-oznaka">Nabavka robe</p><p class="izvod-broj">' + dinara(sada.trosak) + '</p></div>';
+    h += '<div class="izvod-kutija"><p class="izvod-oznaka">Neto zarada</p><p class="izvod-broj">' + dinara(sada.zarada) + '</p></div>';
+    h += '<div class="izvod-kutija"><p class="izvod-oznaka">Marža</p><p class="izvod-broj">' + Math.round(sada.marza) + '%</p></div>';
+    h += '</div>';
+
+    h += '<h3>Analiza meseca</h3><ul>';
+    analiza(sada, pre, imeMeseca, imePrethodnog).forEach(function(r){ h += '<li>' + r + '</li>'; });
+    h += '</ul>';
+
+    var maxDan = 0;
+    sada.poDanu.forEach(function(v){ if(v > maxDan){ maxDan = v; } });
+    h += '<h3>Zarada po danima</h3><div class="izvod-grafikon">';
+    sada.poDanu.forEach(function(v){
+      var visina = (v > 0 && maxDan > 0) ? Math.max(2, Math.round(v / maxDan * 100)) : 0;
+      h += '<div class="izvod-stub" style="height:' + visina + '%"></div>';
+    });
+    h += '</div><div class="izvod-osa">';
+    for(var d = 1; d <= sada.brojDana; d++){
+      h += '<span>' + ((d === 1 || d % 5 === 0 || d === sada.brojDana) ? d : "") + '</span>';
+    }
+    h += '</div>';
+
+    h += '<h3>Zarada po proizvodu</h3><table><thead><tr>' +
+      '<th>Proizvod</th><th>Kom.</th><th>Nabavka</th><th>Promet</th><th>Zarada</th><th>Marža</th>' +
+      '</tr></thead><tbody>';
+    sada.proizvodi.forEach(function(p){
+      h += '<tr><td>' + bezHtml(p.ime) + '</td><td>' + p.kom + '</td><td>' + dinara(p.trosak) +
+        '</td><td>' + dinara(p.promet) + '</td><td>' + dinara(p.zarada) + '</td><td>' +
+        (p.promet > 0 ? Math.round(p.zarada / p.promet * 100) + "%" : "—") + '</td></tr>';
+    });
+    h += '</tbody><tfoot><tr><td>Ukupno</td><td>' + sada.komada + '</td><td>' + dinara(sada.trosak) +
+      '</td><td>' + dinara(sada.promet) + '</td><td>' + dinara(sada.zarada) + '</td><td>' +
+      Math.round(sada.marza) + '%</td></tr></tfoot></table>';
+
+    h += '<h3 class="lom">Sve prodaje u mesecu</h3><table><thead><tr>' +
+      '<th>Datum</th><th>Proizvod</th><th>Kom.</th><th>Nabavna</th><th>Prodajna</th><th>Zarada</th>' +
+      '</tr></thead><tbody>';
+    sada.stavke.slice().sort(function(a,b){ return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : a.id - b.id); })
+      .forEach(function(s){
+        h += '<tr><td>' + lepDatum(s.datum) + '</td><td>' + bezHtml(s.proizvod) + '</td><td>' + s.kolicina +
+          '</td><td>' + dinara(s.nabavna) + '</td><td>' + dinara(s.prodajna) + '</td><td>' +
+          dinara(zaradaStavke(s)) + '</td></tr>';
+      });
+    h += '</tbody></table>';
+
+    var sad = new Date();
+    h += '<p class="izvod-potpis">Izvod napravljen ' + sad.getDate() + ". " + MESECI[sad.getMonth()] + " " +
+      sad.getFullYear() + ". u " + dvocifra(sad.getHours()) + ":" + dvocifra(sad.getMinutes()) +
+      ' · Moja zarada</p>';
+
+    el("izvod").innerHTML = h;
+    window.setTimeout(function(){ window.print(); }, 100);
+  }
+
+  el("dugmeIzvod").addEventListener("click", napraviIzvod);
+
+  /* ---------- forma ---------- */
+  function brojIzPolja(id){
+    var v = el(id).value.replace(",", ".").trim();
+    if(v === ""){ return NaN; }
+    return Number(v);
+  }
+  function osveziPregled(){
+    var kol = brojIzPolja("poljeKolicina");
+    var nab = brojIzPolja("poljeNabavna");
+    var pro = brojIzPolja("poljeProdajna");
+    if(isNaN(kol) || isNaN(nab) || isNaN(pro)){
+      tekst("pregledZarade", "Zarada na ovoj prodaji: 0 RSD");
+      return;
+    }
+    var z = (pro - nab) * kol;
+    el("pregledZarade").textContent = "Zarada na ovoj prodaji: " + (z >= 0 ? "" : "") + dinara(z) +
+      (pro > 0 ? "  ·  marža " + Math.round((pro - nab) / pro * 100) + "%" : "");
+  }
+  ["poljeKolicina","poljeNabavna","poljeProdajna"].forEach(function(id){
+    el(id).addEventListener("input", osveziPregled);
+  });
+
+  function poruka(id, sadrzaj, greska){
+    var p = el(id);
+    p.textContent = sadrzaj;
+    p.className = "poruka" + (greska ? " greska" : "");
+    window.setTimeout(function(){ p.className = "poruka sakrij"; }, 4000);
+  }
+
+  el("formaProdaje").addEventListener("submit", function(dogadjaj){
+    dogadjaj.preventDefault();
+    var ime = el("poljeProizvod").value.trim();
+    var kol = brojIzPolja("poljeKolicina");
+    var nab = brojIzPolja("poljeNabavna");
+    var pro = brojIzPolja("poljeProdajna");
+    var datum = el("poljeDatum").value;
+
+    if(ime === ""){ poruka("porukaForme", "⚠️ Upiši šta si prodao.", true); el("poljeProizvod").focus(); return; }
+    if(isNaN(kol) || kol < 1){ poruka("porukaForme", "⚠️ Količina mora biti bar 1 komad.", true); el("poljeKolicina").focus(); return; }
+    if(isNaN(pro) || pro < 0){ poruka("porukaForme", "⚠️ Upiši prodajnu cenu.", true); el("poljeProdajna").focus(); return; }
+    if(isNaN(nab) || nab < 0){ nab = 0; }
+    if(!datum){ datum = kljucDatuma(new Date()); }
+
+    prodaje.push({
+      id: Date.now() + Math.floor(Math.random()*1000),
+      proizvod: ime,
+      kolicina: Math.round(kol),
+      nabavna: nab,
+      prodajna: pro,
+      datum: datum
+    });
+    var uspelo = sacuvaj(prodaje);
+    naRed(prodaje[prodaje.length - 1].id);
+    sinhronizuj(true);
+
+    var d = datum.split("-");
+    izabranaGodina = Number(d[0]);
+    izabraniMesec = Number(d[1]) - 1;
+    osveziSve();
+
+    poruka("porukaForme", uspelo
+      ? "✅ Sačuvano! Zarada: " + dinara((pro - nab) * kol)
+      : "✅ Dodato, ali ovaj pretraživač ne pamti podatke — sačuvaj kopiju.", !uspelo);
+
+    el("poljeProizvod").value = "";
+    el("poljeKolicina").value = "1";
+    el("poljeNabavna").value = "";
+    el("poljeProdajna").value = "";
+    osveziPregled();
+    el("poljeProizvod").focus();
+  });
+
+  el("dugmeDodaj").addEventListener("click", function(){
+    el("poljeProizvod").focus();
+    el("poljeProizvod").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ---------- meseci ---------- */
+  el("mesecNazad").addEventListener("click", function(){
+    izabraniMesec--;
+    if(izabraniMesec < 0){ izabraniMesec = 11; izabranaGodina--; }
+    osveziMesec();
+  });
+  el("mesecNapred").addEventListener("click", function(){
+    izabraniMesec++;
+    if(izabraniMesec > 11){ izabraniMesec = 0; izabranaGodina++; }
+    osveziMesec();
+  });
+
+  /* ---------- primer, kopija, brisanje ---------- */
+  el("dugmePrimer").addEventListener("click", function(){
+    if(prodaje.length && !window.confirm("Već imaš unose. Da dodam i primer podataka?")){ return; }
+    var osnova = new Date();
+    var primeri = [
+      ["Majica kratkih rukava", 3, 480, 1490, 1],
+      ["Duks sa kapuljačom", 2, 1350, 3290, 2],
+      ["Pamučne čarape", 6, 90, 350, 3],
+      ["Majica kratkih rukava", 5, 480, 1490, 5],
+      ["Kačket", 1, 420, 1190, 6],
+      ["Duks sa kapuljačom", 3, 1350, 3290, 8]
+    ];
+    primeri.forEach(function(p, i){
+      var d = new Date(osnova.getFullYear(), osnova.getMonth(), Math.max(1, osnova.getDate() - p[4]));
+      prodaje.push({
+        id: Date.now() + i,
+        proizvod: p[0], kolicina: p[1], nabavna: p[2], prodajna: p[3],
+        datum: kljucDatuma(d)
+      });
+    });
+    sacuvaj(prodaje);
+    prodaje.forEach(function(s){ naRed(s.id); });
+    sinhronizuj(true);
+    izabranaGodina = osnova.getFullYear();
+    izabraniMesec = osnova.getMonth();
+    osveziSve();
+  });
+
+  el("dugmeIzvoz").addEventListener("click", function(){
+    var sadrzaj = JSON.stringify(prodaje, null, 2);
+    var blob = new Blob([sadrzaj], { type: "application/json" });
+    var veza = document.createElement("a");
+    veza.href = URL.createObjectURL(blob);
+    veza.download = "moja-zarada-" + kljucDatuma(new Date()) + ".json";
+    document.body.appendChild(veza);
+    veza.click();
+    document.body.removeChild(veza);
+    poruka("porukaKopije", "✅ Kopija je preuzeta.", false);
+  });
+
+  el("poljeUvoz").addEventListener("change", function(dogadjaj){
+    var fajl = dogadjaj.target.files[0];
+    if(!fajl){ return; }
+    var citac = new FileReader();
+    citac.onload = function(){
+      try {
+        var niz = JSON.parse(citac.result);
+        if(!Array.isArray(niz)){ throw new Error("nije lista"); }
+        prodaje = niz;
+        sacuvaj(prodaje);
+        prodaje.forEach(function(s){ naRed(s.id); });
+        sinhronizuj(true);
+        osveziSve();
+        poruka("porukaKopije", "✅ Podaci su vraćeni iz kopije.", false);
+      } catch(e){
+        poruka("porukaKopije", "⚠️ Ovaj fajl nije ispravna kopija.", true);
+      }
+    };
+    citac.readAsText(fajl);
+    dogadjaj.target.value = "";
+  });
+
+  el("dugmeBrisiSve").addEventListener("click", function(){
+    if(window.confirm("Ovo briše sve unete prodaje. Sigurno?")){
+      prodaje.forEach(function(s){ naRedBrisanje(s.id); });
+      prodaje = [];
+      sinhronizuj(true);
+      sacuvaj(prodaje);
+      osveziSve();
+      poruka("porukaKopije", "Sve je obrisano.", false);
+    }
+  });
+
+  /* ---------- start ---------- */
+  el("poljeDatum").value = kljucDatuma(new Date());
+  tekst("danasnjiDatum", new Date().getDate() + ". " + MESECI[new Date().getMonth()] + " " + new Date().getFullYear() + ".");
+  tekst("godina", String(new Date().getFullYear()));
+  if(!localnoRadi){
+    tekst("statusCuvanja", "Napomena: ovaj prikaz ne pamti podatke. Otvori fajl sa svog uređaja da bi se sve čuvalo.");
+  }
+  osveziPregled();
+  osveziSve();
+  osveziStatus();
+  if(ulogovan()){ sinhronizuj(true); }
+
+  if("serviceWorker" in navigator && window.location.protocol.indexOf("http") === 0){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js")["catch"](function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
