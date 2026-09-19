@@ -441,7 +441,7 @@ create policy "samo svoje" on public.prodaje
 
     <div class="kartica sakrij" id="korakPrijava">
       <h3>Prijavi se</h3>
-      <p style="margin-top:0;max-width:70ch">Ovim mejlom i lozinkom ulaziš u svoju aplikaciju sa bilo kog uređaja. Prvi put klikni „Napravi nalog".</p>
+      <p style="margin-top:0;max-width:70ch">Ovim mejlom i lozinkom ulaziš u svoju aplikaciju sa bilo kog uređaja. Prvi put klikni „Napravi nalog" — vidiš isključivo svoje prodaje, niko drugi.</p>
       <div class="polja">
         <div class="polje--siroko">
           <label for="poljeMejl">Tvoj mejl</label>
@@ -800,7 +800,11 @@ create policy "samo svoje" on public.prodaje
     try { window.localStorage.setItem(kljuc, JSON.stringify(vrednost)); } catch(e){}
   }
 
-  var nalog = uzmiObjekat(KLJUC_NALOG, null);
+  var UGRADJENO = {
+    url: "https://zqbqqvtpwudszxqwqofv.supabase.co",
+    kljuc: "sb_publishable_Qi9te4oTFXXywNptCOYeGQ_lgYurrxf"
+  };
+  var nalog = uzmiObjekat(KLJUC_NALOG, null) || UGRADJENO;
   var sesija = uzmiObjekat(KLJUC_SESIJA, null);
   var ceka = uzmiObjekat(KLJUC_CEKA, { slanje: [], brisanje: [] });
   if(!ceka.slanje){ ceka.slanje = []; }
