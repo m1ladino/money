@@ -465,8 +465,21 @@ create policy "samo svoje" on public.prodaje
       <p class="stat-dodatak" id="prikazSinhronizacije">Sve je sačuvano.</p>
       <div class="alatke" style="margin-top:var(--razmak-2)">
         <button type="button" class="dugme dugme--sporedno" id="dugmeSinhronizuj">🔄 Sinhronizuj sada</button>
+        <button type="button" class="dugme dugme--sporedno" id="dugmePozovi">👥 Pozovi drugara</button>
         <button type="button" class="dugme dugme--sporedno" id="dugmeOdjava">🚪 Odjavi se</button>
       </div>
+    </div>
+
+    <div class="kartica sakrij" id="kutijaPozivnice" style="margin-top:var(--razmak-2)">
+      <h3>👥 Pozivnica za drugara</h3>
+      <p style="margin-top:0;max-width:70ch">Pošalji mu ovaj link. Kad ga otvori, aplikacija mu je već podešena — samo napravi svoj nalog i vidi isključivo svoje prodaje.</p>
+      <label for="poljePozivnica">Link za slanje</label>
+      <input type="text" id="poljePozivnica" readonly>
+      <div class="alatke" style="margin-top:var(--razmak-2)">
+        <button type="button" class="dugme" id="dugmePosaljiPozivnicu">📤 Pošalji link</button>
+        <button type="button" class="dugme dugme--sporedno" id="dugmeSakrijPozivnicu">Zatvori</button>
+      </div>
+      <p class="stat-dodatak" style="margin-top:.6rem">Ako dugme ne radi, drži prst na polju iznad, označi sve i kopiraj ručno.</p>
     </div>
 
     <p class="poruka sakrij" id="porukaNaloga" role="status" aria-live="polite"></p>
@@ -1020,6 +1033,60 @@ create policy "samo svoje" on public.prodaje
     }
   });
 
+  function osnovniLink(){
+    return window.location.origin + window.location.pathname;
+  }
+
+  el("dugmePozovi").addEventListener("click", function(){
+    if(!nalog){ return; }
+    var kod = "";
+    try {
+      kod = window.btoa(JSON.stringify({ u: nalog.url, k: nalog.kljuc }));
+    } catch(e){
+      poruka("porukaNaloga", "⚠️ Nije uspelo pravljenje linka.", true);
+      return;
+    }
+    var link = osnovniLink() + "#podesavanje=" + encodeURIComponent(kod);
+    el("poljePozivnica").value = link;
+    el("kutijaPozivnice").className = "kartica";
+    el("kutijaPozivnice").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  el("dugmeSakrijPozivnicu").addEventListener("click", function(){
+    el("kutijaPozivnice").className = "kartica sakrij";
+  });
+
+  el("dugmePosaljiPozivnicu").addEventListener("click", function(){
+    var link = el("poljePozivnica").value;
+    if(navigator.share){
+      navigator.share({ title: "Moja zarada", text: "Aplikacija za praćenje zarade:", url: link })["catch"](function(){});
+      return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(function(){
+        poruka("porukaNaloga", "✅ Link je kopiran.", false);
+      })["catch"](function(){
+        el("poljePozivnica").select();
+        poruka("porukaNaloga", "Označi link u polju i kopiraj ručno.", true);
+      });
+      return;
+    }
+    el("poljePozivnica").select();
+  });
+
+  function primiPodesavanjeIzLinka(){
+    var h = window.location.hash || "";
+    var oznaka = "#podesavanje=";
+    if(h.indexOf(oznaka) !== 0){ return; }
+    try {
+      var o = JSON.parse(window.atob(decodeURIComponent(h.slice(oznaka.length))));
+      if(o && o.u && o.k && (!nalog || nalog.kljuc !== o.k)){
+        nalog = { url: o.u, kljuc: o.k };
+        upisiObjekat(KLJUC_NALOG, nalog);
+      }
+    } catch(e){}
+  }
+
   window.addEventListener("online", function(){ sinhronizuj(true); });
 
   /* ---------- mesečni izvod za PDF ---------- */
@@ -1376,6 +1443,7 @@ create policy "samo svoje" on public.prodaje
   }
   osveziPregled();
   osveziSve();
+  primiPodesavanjeIzLinka();
   osveziStatus();
   if(ulogovan()){ sinhronizuj(true); }
 
